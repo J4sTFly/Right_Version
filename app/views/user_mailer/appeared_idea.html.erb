@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+<h1>Appeared new idea, <%= @user.name %></h1>
+<p>
+  You need to check it,
+  your username is: <%= @user.email %>.<br>
+</p>
+<p>
+  To check this idea, just follow this link: <%= link_to @idea.name, @idea %>
+</p>
+<p>Thanks for those that you're with us!</p>
+</body>
+</html>
+

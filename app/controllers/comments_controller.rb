@@ -1,6 +1,7 @@
-class CommentController < ApplicationController
+class CommentsController < ApplicationController
   before_action :authenticate_user!
   before_action :find_comment, only: %i[show update destroy ]
+  before_action :author?, only: %i[show update destroy]
 
   def index
     render json: Comment.all
@@ -10,7 +11,7 @@ class CommentController < ApplicationController
   end
 
   def create
-    @comment =  Comment.create!(comment_params)
+    @comment =  Comment.new(comment_params)
     save_comment
   end
 
@@ -22,19 +23,13 @@ class CommentController < ApplicationController
   end
 
   def update
-    if @comment.user == current_user
-      @comment.update(comment_params)
-      save_comment
-    else
-      render json: { message: "Access restricted" }
+    @comment.update(comment_params)
+    save_comment
   end
 
   def destroy
-    if @comment.user == current_user
-      Comment.delete @comment.id
-    else
-      render json: { message: "Access restricted" }
-    end
+    Comment.delete @comment.id
+    render json: { message: "Deleted successfully" }
   end
 
 
@@ -48,12 +43,6 @@ class CommentController < ApplicationController
     end
   end
 
-  def not_comment
-    render json: {
-      status: { code: 404, message: "This comment doesn't exist" }
-    }
-  end
-
   def comment_params
     params.require(:comment).permit!
   end
@@ -63,10 +52,14 @@ class CommentController < ApplicationController
       begin
       @comment = Comment.find params[:id]
       rescue ActiveRecord::RecordNotFound
-        render json: {message: "Comment not found"}
+        render json: { message: "Comment not found" }
       end
     else
-      render json: {message: "No id provided"}
+      render json: { message: "No id provided" }
     end
   end
+
+    def author?
+      restrict unless @comment.user_id == current_user.id
+    end
 end

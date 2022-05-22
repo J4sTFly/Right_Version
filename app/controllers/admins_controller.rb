@@ -1,4 +1,4 @@
-class AdminController < ApplicationController
+class AdminsController < ApplicationController
   before_action :authenticate_user!
   before_action :is_admin?
   # before_action :find_user, only: %i[show destroy]

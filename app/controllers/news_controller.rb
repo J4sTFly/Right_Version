@@ -32,7 +32,7 @@ class NewsController < ApplicationController
   end
 
   def show
-    case news.available_to
+    case @news.available_to
     when 'nobody'
       authenticate_user!
       author?
@@ -43,11 +43,8 @@ class NewsController < ApplicationController
   end
 
   def destroy
-    begin
-      News.delete @news.id
-    rescue => e
-      render json: e
-    end
+    News.delete @news.id
+    render json: { message: "Deleted successfully" }
   end
 
   def list_unapproved
@@ -59,9 +56,13 @@ class NewsController < ApplicationController
   end
 
   def approve
+    if current_user.admin?
     # POST Request contains array of News' ids to approve
-    params[:approve_list].each do |news_id|
-      News.find(news_id).approve
+      params[:approve_list].each do |news_id|
+        News.find(news_id).approve
+      end
+    else
+      restrict
     end
   end
 
@@ -71,20 +72,11 @@ class NewsController < ApplicationController
     params.require(:news).permit!
   end
 
-  def access_rights
-    if current_user.present?
-      @rights = current_user.admin? or @news.author.id == current_user.id ? 'full' : 'authorized'
-    else
-      @rights = 'unauthorized'
-    end
-
-  end
-
   def find_news
     #@news = params[:id].present? ? News.find(params[:id]) : render json: { message: "No id provided" }
     if params[:id].present?
       begin
-        @news = News.find(params[:id])
+        @news = News.published.find(params[:id])
       rescue RecordNotFound
         render json: {message: "News not found."}
       end
@@ -99,10 +91,6 @@ class NewsController < ApplicationController
     else
       render json: @news.errors.full_messages
     end
-  end
-
-  def restrict
-    render json: { message: "Access restricted"}
   end
 
   def author?

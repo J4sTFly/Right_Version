@@ -2,7 +2,7 @@ class News < ApplicationRecord
   has_one_attached :preview
   has_many_attached :related_images
 
-  #validates :title, presence: true, blank: false, length: { minimum: 4, maximum: 128}
+  validates :title, presence: true, length: { minimum: 4, maximum: 128}
 
   enum available_to: {
     nobody: 0,

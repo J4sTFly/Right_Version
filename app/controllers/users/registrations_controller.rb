@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class Users::RegistrationsController < Devise::RegistrationsController
-  include ActionController::Flash
   before_action :authenticate_user!
-  before_action :restrict_admin_creation, only: [:create]
+  #before_action :restrict_admin_creation, only: [:create]
   respond_to :json
-  # before_action : configure_sign_up_params, only: [:create]
+  # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
 
   # GET /resource/sign_up
@@ -14,14 +13,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
   # end
 
   # POST /resource
-  #def create
-  #   super
-  # end
-
-  # GET /resource/edit
-  def edit
+  def create
     super
   end
+
+  # GET /resource/edit
+  #def edit
+  #  super
+  #end
 
   # PUT /resource
   # def update
@@ -42,7 +41,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super
   # end
 
-  # protected
+  protected
 
   # If you have extra params to permit, append them to the sanitizer.
   # def configure_sign_up_params
@@ -64,7 +63,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
   #   super(resource)
   # end
 
-  private
+  def respond_with(resource, opts={})
+    if resource.valid?
+      render json: resource
+    else
+      render json: resource.errors.messages
+    end
+
+  end
 
   def restrict_admin_creation
     render json: {message: "Forbidden role"}, status: :forbidden unless params[:user][:role] != 2

@@ -9,10 +9,11 @@ class CreateNews < ActiveRecord::Migration[7.0]
       t.string :location
       t.datetime :added, now: true
       t.datetime :published_at, null: true
-      t.boolean :important, null:false, default: true
+      t.boolean :important, null:false, default: false
       t.timestamps
 
       t.belongs_to :author, :model_name => "User"
+
 
       t.index :status
       t.index :important

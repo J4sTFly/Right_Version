@@ -1,18 +1,11 @@
 # frozen_string_literal: true
 
 class Users::SessionsController < Devise::SessionsController
-
   before_action :authenticate_user!
 
   respond_to :json
   # before_action :configure_sign_in_params, only: [:create]
 
-  def index
-    puts "I AM HERE"
-    puts authenticate_user!
-    binding.pry
-    render json: current_user
-  end
   # GET /resource/sign_in
   # def new
   #   super

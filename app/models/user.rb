@@ -1,23 +1,8 @@
 class User < ApplicationRecord
   has_one_attached :avatar
+  include Devise::JWT::RevocationStrategies::JTIMatcher
 
-  devise :database_authenticatable,
-         :jwt_authenticatable,
-         :registerable,
-         :recoverable,
-         :rememberable,
-         :validatable,
-         :confirmable,
-         jwt_revocation_strategy: :JwtDenylist
-
-  enum role: {
-    user: 0,
-    correspondent: 1,
-    admin: 2,
-    borov: 3
-  }
-
-  validates_presence_of :password_confirmation
+  validates_presence_of :password_confirmation, if: :password_required?
 
   validates :username,
             uniqueness: true,
@@ -30,12 +15,27 @@ class User < ApplicationRecord
             length: { maximum: 255 },
             format: { with: Devise.email_regexp }
 
+  devise :database_authenticatable,
+         :jwt_authenticatable,
+         :registerable,
+         :recoverable,
+         :rememberable,
+         :validatable,
+         :confirmable,
+         jwt_revocation_strategy: self
+
+  enum role: {
+    user: 0,
+    correspondent: 1,
+    admin: 2,
+    borov: 3
+  }
+
   #validates :phone,
   #         numericality: true,
   #         length: {maximum: 15}
 
-  has_many :news, foreign_key: 'user_id'
+  has_many :news, foreign_key: 'author_id'
   has_many :rates, dependent: :nullify
   has_many :comments, dependent: :nullify
-
 end

@@ -1,5 +1,5 @@
 class CategoriesController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_user!, except: %i[index]
   before_action :find_category, except: %i[index create]
   before_action :admin?, except: %i[index]
 
@@ -7,15 +7,9 @@ class CategoriesController < ApplicationController
     render json: Category.all
   end
 
-  def new
-  end
-
   def create
     @category = Category.new category_params
     save_category
-  end
-
-  def edit
   end
 
   def update
@@ -51,9 +45,5 @@ class CategoriesController < ApplicationController
     else
       render json: { message: "No id provided" }
     end
-  end
-
-  def admin?
-    current_user.admin?
   end
 end

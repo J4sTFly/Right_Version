@@ -1,14 +1,18 @@
 Rails.application.routes.draw do
-  # admin
-  resources :admin, only: %i[destroy show index]
+  resources :admins
+  resources :categories
+  resources :comments
+  resources :rates
+  resources :tags
 
   resources :news do
     get '/pages/:page', to: 'news#index', on: :collection
+    post '/approve', to: 'news#approve'
+    post '/sort_by', to: 'news#sort_by'
   end
 
   as :user do
     post '/signup', to: 'users/registrations#create'
-    put "/update_password" => "users/registrations#update_password"
   end
 
   devise_for :user, path: '', path_names: {

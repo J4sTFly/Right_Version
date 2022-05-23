@@ -2,24 +2,19 @@ class CommentsController < ApplicationController
   before_action :authenticate_user!
   before_action :find_comment, only: %i[show update destroy ]
   before_action :author?, only: %i[show update destroy]
+  before_action :admin?, only: %i[index]
 
   def index
     render json: Comment.all
   end
 
-  def new
-  end
-
   def create
-    @comment =  Comment.new(comment_params)
+    @comment = Comment.new(comment_params)
     save_comment
   end
 
   def show
     render @comment
-  end
-
-  def edit
   end
 
   def update
@@ -31,7 +26,6 @@ class CommentsController < ApplicationController
     Comment.delete @comment.id
     render json: { message: "Deleted successfully" }
   end
-
 
   private
 
@@ -50,7 +44,7 @@ class CommentsController < ApplicationController
   def find_comment
     if params[:id].present?
       begin
-      @comment = Comment.find params[:id]
+        @comment = Comment.find params[:id]
       rescue ActiveRecord::RecordNotFound
         render json: { message: "Comment not found" }
       end

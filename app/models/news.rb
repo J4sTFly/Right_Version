@@ -45,5 +45,7 @@ class News < ApplicationRecord
   def approve
     self.approved = true
     self.published!
+    self.published_at = Time.now
+    self.save
   end
 end

@@ -5,13 +5,18 @@ class NewsController < ApplicationController
 
   def index
     if user_signed_in?
-      render json: News.authorized.order('title').page(params[:page])
+      @news = News.authorized.order('title').page(params[:page]).includes(:author, :category, :comments, :rates)
     else
-      render json: News.unauthorized.order('title').page(params[:page])
+      @news = News.unauthorized.order('title').page(params[:page])#.includes(:author, :category, :comments, :rates)
     end
   end
 
-  def new
+  def sort_by
+    if News.respond_to?(params[:sort_by])
+      render json: News.send(params[:sort_by])
+    else
+      render json: { message: "Wrong scope." }
+    end
   end
 
   def create
@@ -21,9 +26,6 @@ class NewsController < ApplicationController
     else
       restrict
     end
-  end
-
-  def edit
   end
 
   def update

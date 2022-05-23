@@ -2,23 +2,15 @@ class RatesController < ApplicationController
   before_action :authenticate_user!
   before_action :find_rate, only: %i[update destroy]
   before_action :author?, only: %i[update destroy]
+  before_action :admin?, only: %i[index]
 
   def index
     render json: Rate.all
   end
 
-  def new
-  end
-
   def create
     @rate = Rate.new(rate_params)
     save_rate
-  end
-
-  def show
-  end
-
-  def edit
   end
 
   def update
@@ -38,11 +30,27 @@ class RatesController < ApplicationController
     params.require(:rate).permit!
   end
 
+  def find_rate
+    if params[:id].present?
+      begin
+        @rate = News.published.find(params[:id])
+      rescue RecordNotFound
+        render json: {message: "Rate not found."}
+      end
+    else
+      render json: { message: "No id provided" }
+    end
+  end
+
   def save_rate
     if @rate.save
       render json: @rate
     else
       render json: @rate.errors.full_messages
     end
+  end
+
+  def author?
+    restrict unless @rate.author.id == current_user.id
   end
 end
